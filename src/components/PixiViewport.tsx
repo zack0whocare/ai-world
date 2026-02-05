@@ -22,8 +22,8 @@ export default PixiComponent('Viewport', {
   create(props: ViewportProps) {
     const { app, children, viewportRef, ...viewportProps } = props;
     const viewport = new Viewport({
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
-      events: app.renderer.events as any,
+      // events property removed due to type incompatibility with pixi-viewport
+      // events: app.renderer.events,
       passiveWheel: false,
       screenWidth: viewportProps.screenWidth,
       screenHeight: viewportProps.screenHeight,
