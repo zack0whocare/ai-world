@@ -23,9 +23,12 @@ export default PixiComponent('Viewport', {
     const { app, children, viewportRef, ...viewportProps } = props;
     const viewport = new Viewport({
       // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
-      events: app.renderer.events,
+      events: app.renderer.events as any,
       passiveWheel: false,
-      ...viewportProps,
+      screenWidth: viewportProps.screenWidth,
+      screenHeight: viewportProps.screenHeight,
+      worldWidth: viewportProps.worldWidth,
+      worldHeight: viewportProps.worldHeight,
     });
     if (viewportRef) {
       viewportRef.current = viewport;
