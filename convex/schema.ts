@@ -27,25 +27,28 @@ export default defineSchema({
 
   // AI World Extension Tables
   resources: defineTable({
-    id: v.string(),
     type: v.string(),
     position: v.object({ x: v.number(), y: v.number() }),
     amount: v.number(),
     maxAmount: v.number(),
     regenerateRate: v.number(),
     lastRegenerate: v.number(),
+    id: v.optional(v.string()), // Temporary for migration
   }),
 
   buildings: defineTable({
-    id: v.string(),
     type: v.string(),
-    position: v.object({ x: v.number(), y: v.number() }),
     ownerId: v.string(),
-    ownerName: v.string(),
-    builtAt: v.number(),
+    position: v.object({ x: v.number(), y: v.number() }),
     level: v.number(),
     health: v.number(),
-    maxHealth: v.number(),
+    constructionProgress: v.number(),
+    isActive: v.boolean(),
+    productionRate: v.number(),
+    id: v.optional(v.string()), // Temporary for migration
+    ownerName: v.optional(v.string()), // Temporary for migration
+    builtAt: v.optional(v.number()), // Temporary for migration
+    maxHealth: v.optional(v.number()), // Temporary for migration
   }).index("by_owner", ["ownerId"]),
 
   tradeOffers: defineTable({

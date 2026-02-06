@@ -6,7 +6,6 @@
 export type ResourceType = 'wood' | 'stone' | 'food' | 'gold';
 
 export interface Resource {
-  id: string;
   type: ResourceType;
   position: { x: number; y: number };
   amount: number;
@@ -55,14 +54,14 @@ export const RESOURCE_CONFIG = {
 
 export function initializeResources(): Resource[] {
   return [
-    { id: 'tree_1', type: 'wood', position: { x: 10, y: 15 }, amount: 10, maxAmount: 10, regenerateRate: 0.1, lastRegenerate: Date.now() },
-    { id: 'tree_2', type: 'wood', position: { x: 12, y: 16 }, amount: 10, maxAmount: 10, regenerateRate: 0.1, lastRegenerate: Date.now() },
-    { id: 'tree_3', type: 'wood', position: { x: 14, y: 14 }, amount: 10, maxAmount: 10, regenerateRate: 0.1, lastRegenerate: Date.now() },
-    { id: 'rock_1', type: 'stone', position: { x: 25, y: 8 }, amount: 15, maxAmount: 15, regenerateRate: 0.05, lastRegenerate: Date.now() },
-    { id: 'rock_2', type: 'stone', position: { x: 27, y: 10 }, amount: 15, maxAmount: 15, regenerateRate: 0.05, lastRegenerate: Date.now() },
-    { id: 'farm_1', type: 'food', position: { x: 5, y: 25 }, amount: 20, maxAmount: 20, regenerateRate: 0.2, lastRegenerate: Date.now() },
-    { id: 'farm_2', type: 'food', position: { x: 8, y: 27 }, amount: 20, maxAmount: 20, regenerateRate: 0.2, lastRegenerate: Date.now() },
-    { id: 'gold_1', type: 'gold', position: { x: 30, y: 30 }, amount: 5, maxAmount: 5, regenerateRate: 0.02, lastRegenerate: Date.now() },
+    { type: 'wood', position: { x: 10, y: 15 }, amount: 10, maxAmount: 10, regenerateRate: 0.1, lastRegenerate: Date.now() },
+    { type: 'wood', position: { x: 12, y: 16 }, amount: 10, maxAmount: 10, regenerateRate: 0.1, lastRegenerate: Date.now() },
+    { type: 'wood', position: { x: 14, y: 14 }, amount: 10, maxAmount: 10, regenerateRate: 0.1, lastRegenerate: Date.now() },
+    { type: 'stone', position: { x: 25, y: 8 }, amount: 15, maxAmount: 15, regenerateRate: 0.05, lastRegenerate: Date.now() },
+    { type: 'stone', position: { x: 27, y: 10 }, amount: 15, maxAmount: 15, regenerateRate: 0.05, lastRegenerate: Date.now() },
+    { type: 'food', position: { x: 5, y: 25 }, amount: 20, maxAmount: 20, regenerateRate: 0.2, lastRegenerate: Date.now() },
+    { type: 'food', position: { x: 8, y: 27 }, amount: 20, maxAmount: 20, regenerateRate: 0.2, lastRegenerate: Date.now() },
+    { type: 'gold', position: { x: 30, y: 30 }, amount: 5, maxAmount: 5, regenerateRate: 0.02, lastRegenerate: Date.now() },
   ];
 }
 
