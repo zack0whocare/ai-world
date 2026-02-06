@@ -259,14 +259,17 @@ export const gatherResource = mutation({
       return { success: false, error: "资源点不存在" };
     }
     
-    if (resource.amount <= 0) {
+    const amount = resource.amount as number;
+    const type = resource.type as string;
+    
+    if (amount <= 0) {
       return { success: false, error: "资源已耗尽" };
     }
     
     // 采集资源
-    const gatherAmount = Math.min(10, resource.amount);
-    const newInventory = { ...agent.inventory };
-    newInventory[resource.type as keyof typeof newInventory] += gatherAmount;
+    const gatherAmount = Math.min(10, amount);
+    const newInventory = { ...agent.inventory } as any;
+    newInventory[type] += gatherAmount;
     
     // 更新智能体库存
     await ctx.db.patch(agent._id, {
@@ -279,12 +282,12 @@ export const gatherResource = mutation({
     
     // 更新资源点
     await ctx.db.patch(args.resourceId, {
-      amount: resource.amount - gatherAmount,
+      amount: amount - gatherAmount,
     });
     
     return {
       success: true,
-      message: `采集了 ${gatherAmount} ${resource.type}`,
+      message: `采集了 ${gatherAmount} ${type}`,
       gathered: gatherAmount,
       newInventory,
     };
