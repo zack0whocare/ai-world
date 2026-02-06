@@ -4,7 +4,7 @@
 
 import { mutation, query } from "../_generated/server";
 import { v } from "convex/values";
-import { createPlayerAgent } from "./player-agents";
+import { createPlayerAgent } from "./player_agents";
 import { createEmptyInventory } from "./resources";
 import { generatePersonality, generateGoalsForPersonality } from "./goals";
 

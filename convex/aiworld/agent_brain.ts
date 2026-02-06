@@ -2,7 +2,7 @@
  * AI Agent思考和决策系统 - 使用豆包模型
  */
 
-import { callDoubaoAPI, generateAgentDecisionPrompt } from './llm-config';
+import { callDoubaoAPI, generateAgentDecisionPrompt } from './llm_config';
 import { decideNextAction } from './goals';
 
 /**

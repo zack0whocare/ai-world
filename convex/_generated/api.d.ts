@@ -8,11 +8,6 @@
  * @module
  */
 
-import type {
-  ApiFromModules,
-  FilterApi,
-  FunctionReference,
-} from "convex/server";
 import type * as agent_conversation from "../agent/conversation.js";
 import type * as agent_embeddingsCache from "../agent/embeddingsCache.js";
 import type * as agent_memory from "../agent/memory.js";
@@ -34,6 +29,16 @@ import type * as aiTown_player from "../aiTown/player.js";
 import type * as aiTown_playerDescription from "../aiTown/playerDescription.js";
 import type * as aiTown_world from "../aiTown/world.js";
 import type * as aiTown_worldMap from "../aiTown/worldMap.js";
+import type * as aiworld_agent_brain from "../aiworld/agent_brain.js";
+import type * as aiworld_building from "../aiworld/building.js";
+import type * as aiworld_config from "../aiworld/config.js";
+import type * as aiworld_goals from "../aiworld/goals.js";
+import type * as aiworld_init from "../aiworld/init.js";
+import type * as aiworld_llm_config from "../aiworld/llm_config.js";
+import type * as aiworld_mutations from "../aiworld/mutations.js";
+import type * as aiworld_player_agents from "../aiworld/player_agents.js";
+import type * as aiworld_resources from "../aiworld/resources.js";
+import type * as aiworld_trading from "../aiworld/trading.js";
 import type * as constants from "../constants.js";
 import type * as crons from "../crons.js";
 import type * as engine_abstractGame from "../engine/abstractGame.js";
@@ -57,14 +62,12 @@ import type * as util_types from "../util/types.js";
 import type * as util_xxhash from "../util/xxhash.js";
 import type * as world from "../world.js";
 
-/**
- * A utility for referencing Convex functions in your app's API.
- *
- * Usage:
- * ```js
- * const myFunctionReference = api.myModule.myFunction;
- * ```
- */
+import type {
+  ApiFromModules,
+  FilterApi,
+  FunctionReference,
+} from "convex/server";
+
 declare const fullApi: ApiFromModules<{
   "agent/conversation": typeof agent_conversation;
   "agent/embeddingsCache": typeof agent_embeddingsCache;
@@ -87,6 +90,16 @@ declare const fullApi: ApiFromModules<{
   "aiTown/playerDescription": typeof aiTown_playerDescription;
   "aiTown/world": typeof aiTown_world;
   "aiTown/worldMap": typeof aiTown_worldMap;
+  "aiworld/agent_brain": typeof aiworld_agent_brain;
+  "aiworld/building": typeof aiworld_building;
+  "aiworld/config": typeof aiworld_config;
+  "aiworld/goals": typeof aiworld_goals;
+  "aiworld/init": typeof aiworld_init;
+  "aiworld/llm_config": typeof aiworld_llm_config;
+  "aiworld/mutations": typeof aiworld_mutations;
+  "aiworld/player_agents": typeof aiworld_player_agents;
+  "aiworld/resources": typeof aiworld_resources;
+  "aiworld/trading": typeof aiworld_trading;
   constants: typeof constants;
   crons: typeof crons;
   "engine/abstractGame": typeof engine_abstractGame;
@@ -110,11 +123,31 @@ declare const fullApi: ApiFromModules<{
   "util/xxhash": typeof util_xxhash;
   world: typeof world;
 }>;
+
+/**
+ * A utility for referencing Convex functions in your app's public API.
+ *
+ * Usage:
+ * ```js
+ * const myFunctionReference = api.myModule.myFunction;
+ * ```
+ */
 export declare const api: FilterApi<
   typeof fullApi,
   FunctionReference<any, "public">
 >;
+
+/**
+ * A utility for referencing Convex functions in your app's internal API.
+ *
+ * Usage:
+ * ```js
+ * const myFunctionReference = internal.myModule.myFunction;
+ * ```
+ */
 export declare const internal: FilterApi<
   typeof fullApi,
   FunctionReference<any, "internal">
 >;
+
+export declare const components: {};
