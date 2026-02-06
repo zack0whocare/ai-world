@@ -378,3 +378,123 @@ export const buildStructure = mutation({
     };
   },
 });
+
+/**
+ * 批量执行所有智能体的AI决策
+ * 这个函数会调用每个智能体的决策逻辑并执行相应的动作
+ */
+export const runAllAgentDecisions = mutation({
+  args: {},
+  handler: async (ctx) => {
+    const agents = await ctx.db.query("agentExtensions").collect();
+    const results = [];
+
+    for (const agent of agents) {
+      try {
+        // 简单的决策逻辑：根据性格选择动作
+        const personality = agent.personality;
+        const inventory = agent.inventory as any;
+        
+        let action = null;
+        let actionResult = null;
+
+        // 根据性格决定动作
+        if (personality === "gatherer" || personality === "builder") {
+          // 采集资源
+          const resources = await ctx.db.query("resources").collect();
+          const availableResources = resources.filter((r: any) => (r.amount as number) > 0);
+          
+          if (availableResources.length > 0) {
+            const targetResource = availableResources[0];
+            action = { type: "gather", resourceId: targetResource._id };
+            
+            // 执行采集
+            const resource = await ctx.db.get(targetResource._id);
+            if (resource && (resource.amount as number) > 0) {
+              const gatherAmount = 10;
+              await ctx.db.patch(targetResource._id, {
+                amount: Math.max(0, (resource.amount as number) - gatherAmount),
+              });
+              
+              // 更新智能体库存
+              const newInventory = {
+                wood: inventory.wood + (resource.type === "wood" ? gatherAmount : 0),
+                stone: inventory.stone + (resource.type === "stone" ? gatherAmount : 0),
+                food: inventory.food + (resource.type === "food" ? gatherAmount : 0),
+                gold: inventory.gold + (resource.type === "gold" ? gatherAmount : 0),
+              };
+              
+              await ctx.db.patch(agent._id, {
+                inventory: newInventory,
+                stats: {
+                  ...agent.stats,
+                  gatherCount: (agent.stats as any).gatherCount + 1,
+                },
+              });
+              
+              actionResult = { success: true, gathered: gatherAmount, type: resource.type };
+            }
+          }
+        }
+
+        if (personality === "builder" && inventory.wood >= 30 && inventory.stone >= 20) {
+          // 建造建筑
+          const buildingType = "house";
+          action = { type: "build", buildingType };
+          
+          const position = agent.position || { x: 0, y: 0 };
+          const buildingId = await ctx.db.insert("buildings", {
+            type: buildingType,
+            ownerId: agent.agentId,
+            position: {
+              x: position.x + 2,
+              y: position.y + 2,
+            },
+            level: 1,
+            health: 100,
+            constructionProgress: 100,
+            isActive: true,
+            productionRate: 1.0,
+            builtAt: Date.now(),
+          });
+          
+          // 扣除资源
+          await ctx.db.patch(agent._id, {
+            inventory: {
+              wood: inventory.wood - 30,
+              stone: inventory.stone - 20,
+              food: inventory.food,
+              gold: inventory.gold - 5,
+            },
+            stats: {
+              ...agent.stats,
+              buildCount: (agent.stats as any).buildCount + 1,
+            },
+          });
+          
+          actionResult = { success: true, buildingId, buildingType };
+        }
+
+        results.push({
+          agentId: agent.agentId,
+          name: agent.name,
+          personality,
+          action,
+          result: actionResult || { success: true, action: "wait" },
+        });
+      } catch (error: any) {
+        results.push({
+          agentId: agent.agentId,
+          name: agent.name,
+          error: error.message,
+        });
+      }
+    }
+
+    return {
+      success: true,
+      totalAgents: agents.length,
+      results,
+    };
+  },
+});

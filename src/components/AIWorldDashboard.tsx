@@ -15,7 +15,7 @@ export function AIWorldDashboard() {
   // Mutations
   const createAgent = useMutation(api.aiworld.mutations.createAgent);
   const initWorld = useMutation(api.aiworld.init.initializeWorld);
-  const runAllDecisions = useMutation(api.aiworld.ai_decisions.runAllAgentDecisions);
+  const runAllDecisions = useMutation(api.aiworld.mutations.runAllAgentDecisions);
 
   // Auto-run AI decisions
   useEffect(() => {
