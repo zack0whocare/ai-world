@@ -332,16 +332,19 @@ export const buildStructure = mutation({
     }
     
     // 检查资源是否足够
+    const inventory = agent.inventory as any;
     for (const [resource, amount] of Object.entries(cost)) {
-      if ((agent.inventory as any)[resource] < amount) {
-        return { success: false, error: `资源不足: 需要 ${amount} ${resource}` };
+      const requiredAmount = amount as number;
+      if (inventory[resource] < requiredAmount) {
+        return { success: false, error: `资源不足: 需要 ${requiredAmount} ${resource}` };
       }
     }
     
     // 扣除资源
-    const newInventory = { ...agent.inventory };
+    const newInventory = { ...agent.inventory } as any;
     for (const [resource, amount] of Object.entries(cost)) {
-      (newInventory as any)[resource] -= amount;
+      const costAmount = amount as number;
+      newInventory[resource] -= costAmount;
     }
     
     // 创建建筑
