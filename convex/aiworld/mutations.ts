@@ -47,6 +47,8 @@ export const createAgent = mutation({
       agentId: agentId,
       playerId: "system", // 系统创建的Agent
       playerName: "AI World",
+      name: args.name,
+      position: args.position,
       inventory: inventory,
       goals: goals,
       personality: personality,

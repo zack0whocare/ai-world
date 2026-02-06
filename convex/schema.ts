@@ -70,6 +70,8 @@ export default defineSchema({
     agentId: v.string(),
     playerId: v.string(),
     playerName: v.string(),
+    name: v.optional(v.string()),
+    position: v.optional(v.object({ x: v.number(), y: v.number() })),
     inventory: v.any(),
     goals: v.any(),
     personality: v.any(),

@@ -1,0 +1,13 @@
+Build Errors from Vercel Deployment:
+
+1. convex/aiworld/ai_decisions.ts(255,24): error TS2339: Property 'position' does not exist on type agentExtensions
+2. convex/aiworld/ai_decisions.ts(256,24): error TS2339: Property 'position' does not exist on type agentExtensions
+3. convex/aiworld/ai_decisions.ts(297,23): error TS2339: Property 'name' does not exist on type agentExtensions
+4. convex/aiworld/ai_decisions.ts(303,23): error TS2339: Property 'name' does not exist on type agentExtensions
+5. convex/aiworld/trade_mutations.ts(73,17): error TS2339: Property 'name' does not exist on type agentExtensions
+6. convex/aiworld/trade_mutations.ts(75,15): error TS2339: Property 'name' does not exist on type agentExtensions
+7. convex/aiworld/trade_mutations.ts(98,36): error TS2339: Property 'name' does not exist on type agentExtensions
+
+Root Cause:
+The agentExtensions table schema doesn't include 'position' and 'name' fields.
+Need to check the schema and add missing fields or use correct field names (playerName instead of name).
