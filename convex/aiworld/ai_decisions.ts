@@ -3,8 +3,69 @@
  */
 
 import { v } from "convex/values";
-import { mutation, internalMutation } from "../_generated/server";
+import { mutation, internalMutation, query } from "../_generated/server";
 import { internal } from "../_generated/api";
+import { api } from "../_generated/api";
+
+/**
+ * 决策逻辑内部函数
+ */
+async function makeDecisionLogic(ctx: any, args: { agentId: string }) {
+  // 获取智能体
+  const agent = await ctx.db
+    .query("agentExtensions")
+    .withIndex("by_agent", (q: any) => q.eq("agentId", args.agentId))
+    .first();
+
+  if (!agent) {
+    return { success: false, error: "智能体不存在" };
+  }
+
+  const personality = agent.personality;
+  const inventory = agent.inventory as any;
+  const goals = agent.goals;
+
+  // 根据性格做出决策
+  let decision: any = null;
+
+  switch (personality) {
+    case "gatherer":
+      // 采集者：优先采集资源
+      decision = await decideGathering(ctx, agent);
+      break;
+
+    case "builder":
+      // 建造者：优先建造建筑
+      decision = await decideBuilding(ctx, agent);
+      break;
+
+    case "trader":
+      // 商人：优先交易
+      decision = await decideTrading(ctx, agent);
+      break;
+
+    case "explorer":
+      // 探险家：优先探索
+      decision = await decideExploring(ctx, agent);
+      break;
+
+    case "defender":
+      // 守卫者：优先防御
+      decision = await decideDefending(ctx, agent);
+      break;
+
+    default:
+      // 默认：平衡发展
+      decision = await decideBalanced(ctx, agent);
+  }
+
+  return {
+    success: true,
+    agentId: args.agentId,
+    personality,
+    decision,
+  };
+}
 
 /**
  * AI 智能体自动决策
@@ -13,62 +74,7 @@ export const makeDecision = internalMutation({
   args: {
     agentId: v.string(),
   },
-  handler: async (ctx, args) => {
-    // 获取智能体
-    const agent = await ctx.db
-      .query("agentExtensions")
-      .withIndex("by_agent", (q) => q.eq("agentId", args.agentId))
-      .first();
-
-    if (!agent) {
-      return { success: false, error: "智能体不存在" };
-    }
-
-    const personality = agent.personality;
-    const inventory = agent.inventory as any;
-    const goals = agent.goals;
-
-    // 根据性格做出决策
-    let decision: any = null;
-
-    switch (personality) {
-      case "gatherer":
-        // 采集者：优先采集资源
-        decision = await decideGathering(ctx, agent);
-        break;
-
-      case "builder":
-        // 建造者：优先建造建筑
-        decision = await decideBuilding(ctx, agent);
-        break;
-
-      case "trader":
-        // 商人：优先交易
-        decision = await decideTrading(ctx, agent);
-        break;
-
-      case "explorer":
-        // 探险家：优先探索
-        decision = await decideExploring(ctx, agent);
-        break;
-
-      case "defender":
-        // 守卫者：优先防御
-        decision = await decideDefending(ctx, agent);
-        break;
-
-      default:
-        // 默认：平衡发展
-        decision = await decideBalanced(ctx, agent);
-    }
-
-    return {
-      success: true,
-      agentId: args.agentId,
-      personality,
-      decision,
-    };
-  },
+  handler: makeDecisionLogic,
 });
 
 /**
@@ -100,14 +106,27 @@ async function decideGathering(ctx: any, agent: any) {
  */
 async function decideBuilding(ctx: any, agent: any) {
   const inventory = agent.inventory as any;
+  
+  // 检查资源是否足够建造
+  const buildingTypes = [
+    { type: "house", wood: 30, stone: 20, gold: 5 },
+    { type: "warehouse", wood: 40, stone: 30, gold: 0 },
+    { type: "market", wood: 25, stone: 15, gold: 10 },
+    { type: "watchtower", wood: 15, stone: 25, gold: 5 },
+  ];
 
-  // 检查是否有足够资源建造房屋
-  if (inventory.wood >= 20 && inventory.stone >= 10) {
-    return {
-      action: "build",
-      buildingType: "house",
-      reason: "建造房屋",
-    };
+  for (const building of buildingTypes) {
+    if (
+      inventory.wood >= building.wood &&
+      inventory.stone >= building.stone &&
+      inventory.gold >= building.gold
+    ) {
+      return {
+        action: "build",
+        buildingType: building.type,
+        reason: `建造 ${building.type}`,
+      };
+    }
   }
 
   // 资源不足，先采集
@@ -120,29 +139,26 @@ async function decideBuilding(ctx: any, agent: any) {
 async function decideTrading(ctx: any, agent: any) {
   const inventory = agent.inventory as any;
   
-  // 如果金币少，尝试用其他资源换金币
-  if (inventory.gold < 10) {
-    // 寻找有金币的智能体
+  // 如果金币少于10，尝试用木材换金币
+  if (inventory.gold < 10 && inventory.wood >= 20) {
+    // 寻找其他智能体
     const otherAgents = await ctx.db
       .query("agentExtensions")
       .filter((q: any) => q.neq(q.field("agentId"), agent.agentId))
       .collect();
 
-    for (const other of otherAgents) {
-      const otherInventory = other.inventory as any;
-      if (otherInventory.gold >= 5 && inventory.wood >= 20) {
-        return {
-          action: "trade",
-          targetAgent: other.agentId,
-          offering: { wood: 20 },
-          requesting: { gold: 5 },
-          reason: "用木材换取金币",
-        };
-      }
+    if (otherAgents.length > 0) {
+      return {
+        action: "trade",
+        targetAgentId: otherAgents[0].agentId,
+        offering: { wood: 20 },
+        requesting: { gold: 5 },
+        reason: "用木材换金币",
+      };
     }
   }
 
-  // 没有交易机会，先采集
+  // 没有交易机会，采集资源
   return await decideGathering(ctx, agent);
 }
 
@@ -150,9 +166,11 @@ async function decideTrading(ctx: any, agent: any) {
  * 探险家决策：探索新区域
  */
 async function decideExploring(ctx: any, agent: any) {
-  // 探险家会随机移动到新位置
-  const newX = agent.position.x + (Math.random() > 0.5 ? 5 : -5);
-  const newY = agent.position.y + (Math.random() > 0.5 ? 5 : -5);
+  const currentPos = agent.position || { x: 0, y: 0 };
+  
+  // 随机移动到新位置
+  const newX = currentPos.x + (Math.random() > 0.5 ? 5 : -5);
+  const newY = currentPos.y + (Math.random() > 0.5 ? 5 : -5);
 
   return {
     action: "move",
@@ -165,22 +183,22 @@ async function decideExploring(ctx: any, agent: any) {
  * 守卫者决策：保护建筑
  */
 async function decideDefending(ctx: any, agent: any) {
-  // 检查是否有建筑需要保护
+  // 检查是否有建筑需要守卫
   const buildings = await ctx.db
     .query("buildings")
     .filter((q: any) => q.eq(q.field("ownerId"), agent.agentId))
     .collect();
 
-  if (buildings.length === 0) {
-    // 没有建筑，先建造
-    return await decideBuilding(ctx, agent);
+  if (buildings.length > 0) {
+    return {
+      action: "guard",
+      buildingId: buildings[0]._id,
+      reason: `守卫 ${buildings[0].type}`,
+    };
   }
 
-  return {
-    action: "guard",
-    building: buildings[0]._id,
-    reason: "守卫建筑",
-  };
+  // 没有建筑，先建造一个
+  return await decideBuilding(ctx, agent);
 }
 
 /**
@@ -188,15 +206,8 @@ async function decideDefending(ctx: any, agent: any) {
  */
 async function decideBalanced(ctx: any, agent: any) {
   const inventory = agent.inventory as any;
-  const stats = agent.stats;
-
-  // 如果资源少，先采集
-  const totalResources = inventory.wood + inventory.stone + inventory.food + inventory.gold;
-  if (totalResources < 50) {
-    return await decideGathering(ctx, agent);
-  }
-
-  // 如果没有建筑，建造
+  
+  // 检查是否有建筑
   const buildings = await ctx.db
     .query("buildings")
     .filter((q: any) => q.eq(q.field("ownerId"), agent.agentId))
@@ -213,15 +224,13 @@ async function decideBalanced(ctx: any, agent: any) {
 /**
  * 执行 AI 决策
  */
-export const executeDecision = mutation({
+export const executeDecision: any = internalMutation({
   args: {
     agentId: v.string(),
   },
   handler: async (ctx, args) => {
     // 调用内部决策函数
-    const decision = await ctx.runMutation(internal.aiworld.ai_decisions.makeDecision, {
-      agentId: args.agentId,
-    });
+    const decision = await makeDecisionLogic(ctx, args);
 
     if (!decision.success) {
       return decision;
@@ -234,7 +243,7 @@ export const executeDecision = mutation({
     switch (action) {
       case "gather":
         // 执行采集
-        result = await ctx.runMutation(internal.aiworld.mutations.gatherResource, {
+        result = await ctx.runMutation(api.aiworld.mutations.gatherResource, {
           agentId: args.agentId,
           resourceId: decision.decision.resourceId,
         });
@@ -247,8 +256,8 @@ export const executeDecision = mutation({
           .withIndex("by_agent", (q) => q.eq("agentId", args.agentId))
           .first();
         
-        if (agent) {
-          result = await ctx.runMutation(internal.aiworld.mutations.buildStructure, {
+        if (agent && agent.position) {
+          result = await ctx.runMutation(api.aiworld.mutations.buildStructure, {
             agentId: args.agentId,
             buildingType: decision.decision.buildingType,
             position: {
@@ -263,15 +272,23 @@ export const executeDecision = mutation({
       case "move":
       case "guard":
         // 这些动作暂时只记录
-        result = { success: true, message: decision.decision.reason };
+        result = {
+          success: true,
+          action,
+          message: `执行了 ${action} 动作`,
+        };
         break;
 
       default:
-        result = { success: false, error: "未知动作" };
+        result = {
+          success: false,
+          error: `未知动作: ${action}`,
+        };
     }
 
     return {
       success: true,
+      agentId: args.agentId,
       decision: decision.decision,
       result,
     };
@@ -281,7 +298,7 @@ export const executeDecision = mutation({
 /**
  * 批量执行所有智能体的决策
  */
-export const runAllAgentDecisions = mutation({
+export const runAllAgentDecisions: any = mutation({
   args: {},
   handler: async (ctx) => {
     const agents = await ctx.db.query("agentExtensions").collect();
@@ -289,13 +306,55 @@ export const runAllAgentDecisions = mutation({
 
     for (const agent of agents) {
       try {
-        const result = await ctx.runMutation(internal.aiworld.ai_decisions.executeDecision, {
-          agentId: agent.agentId,
-        });
+        // 直接调用决策逻辑，不通过 runMutation
+        const decision = await makeDecisionLogic(ctx, { agentId: agent.agentId });
+        
+        if (!decision.success) {
+          results.push({
+            agentId: agent.agentId,
+            name: agent.name,
+            error: decision.error,
+          });
+          continue;
+        }
+
+        // 执行决策
+        let actionResult: any = null;
+        const action = decision.decision.action;
+
+        switch (action) {
+          case "gather":
+            actionResult = await ctx.runMutation(api.aiworld.mutations.gatherResource, {
+              agentId: agent.agentId,
+              resourceId: decision.decision.resourceId,
+            });
+            break;
+
+          case "build":
+            if (agent.position) {
+              actionResult = await ctx.runMutation(api.aiworld.mutations.buildStructure, {
+                agentId: agent.agentId,
+                buildingType: decision.decision.buildingType,
+                position: {
+                  x: agent.position.x + 2,
+                  y: agent.position.y + 2,
+                },
+              });
+            }
+            break;
+
+          default:
+            actionResult = { success: true, action };
+        }
+
         results.push({
           agentId: agent.agentId,
           name: agent.name,
-          result,
+          result: {
+            success: true,
+            decision: decision.decision,
+            actionResult,
+          },
         });
       } catch (error: any) {
         results.push({

@@ -70,9 +70,9 @@ export const createTrade = mutation({
     // 创建交易提议
     const trade = createTradeOffer(
       args.fromAgentId,
-      fromAgent.name,
+      fromAgent.name || fromAgent.playerName,
       args.toAgentId,
-      toAgent.name,
+      toAgent.name || toAgent.playerName,
       args.offering,
       args.requesting,
       args.message
@@ -95,7 +95,7 @@ export const createTrade = mutation({
 
     return {
       success: true,
-      message: `交易提议已发送给 ${toAgent.name}`,
+      message: `交易提议已发送给 ${toAgent.name || toAgent.playerName}`,
       trade: { ...trade, _id: tradeId },
       fairness,
     };
