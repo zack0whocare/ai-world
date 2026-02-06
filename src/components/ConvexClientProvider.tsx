@@ -1,5 +1,6 @@
 import { ReactNode } from 'react';
 import { ConvexReactClient, ConvexProvider } from 'convex/react';
+import { api } from '../../convex/_generated/api';
 // import { ConvexProviderWithClerk } from 'convex/react-clerk';
 // import { ClerkProvider, useAuth } from '@clerk/clerk-react';
 
@@ -18,6 +19,12 @@ function convexUrl(): string {
 }
 
 const convex = new ConvexReactClient(convexUrl(), { unsavedChangesWarning: false });
+
+// Expose convex and api to window for console testing
+if (typeof window !== 'undefined') {
+  (window as any).convex = convex;
+  (window as any).api = api;
+}
 
 export default function ConvexClientProvider({ children }: { children: ReactNode }) {
   return (
