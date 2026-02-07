@@ -15,14 +15,14 @@ export function AIWorldDashboard() {
   // Mutations
   const createAgent = useMutation(api.aiworld.mutations.createAgent);
   const initWorld = useMutation(api.aiworld.init.initializeWorld);
-  const runAllDecisions = useMutation(api.aiworld.mutations.runAllAgentDecisions);
+  const runAllDecisions = useMutation(api.aiworld.ai_brain.runAllAIDecisions);
 
   // Auto-run AI decisions
   useEffect(() => {
     if (!autoRunning) return;
 
     const interval = setInterval(() => {
-      runAllDecisions({});
+      runAllDecisions({ useAI: true }); // 使用豆包 AI 决策
     }, 5000); // Run every 5 seconds
 
     return () => clearInterval(interval);
@@ -81,10 +81,10 @@ export function AIWorldDashboard() {
               {autoRunning ? 'Stop Auto-Run' : 'Start Auto-Run'}
             </button>
             <button
-              onClick={() => runAllDecisions({})}
+              onClick={() => runAllDecisions({ useAI: true })}
               className="px-6 py-3 bg-gradient-to-r from-purple-500 to-indigo-600 rounded-lg font-semibold hover:shadow-lg hover:shadow-purple-500/50 transition-all"
             >
-              Run All AI Decisions
+              🤖 Run AI Decisions (Doubao)
             </button>
           </div>
         </div>
