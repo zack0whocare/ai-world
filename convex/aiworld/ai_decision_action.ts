@@ -322,7 +322,25 @@ async function executeDecision(
         return { success: false, error: "无法建造" };
 
       case "explore":
+        // 探索：移动到新位置
+        if (agent.position) {
+          const newX = Math.max(0, Math.min(19, agent.position.x + Math.floor(Math.random() * 5) - 2));
+          const newY = Math.max(0, Math.min(13, agent.position.y + Math.floor(Math.random() * 5) - 2));
+          
+          return await ctx.runMutation(api.aiworld.mutations.moveAgent, {
+            agentId: agent.agentId,
+            newPosition: { x: newX, y: newY },
+          });
+        }
+        return { success: false, error: "无法移动" };
+
       case "wait":
+        return {
+          success: true,
+          action: decision.action,
+          message: decision.reason || `执行了 ${decision.action} 动作`,
+        };
+
       case "trade":
         return {
           success: true,

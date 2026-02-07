@@ -498,3 +498,38 @@ export const runAllAgentDecisions = mutation({
     };
   },
 });
+
+/**
+ * 移动智能体到新位置
+ */
+export const moveAgent = mutation({
+  args: {
+    agentId: v.string(),
+    newPosition: v.object({
+      x: v.number(),
+      y: v.number(),
+    }),
+  },
+  handler: async (ctx, args) => {
+    // 查找智能体
+    const agent = await ctx.db
+      .query("agentExtensions")
+      .filter((q) => q.eq(q.field("agentId"), args.agentId))
+      .first();
+
+    if (!agent) {
+      throw new Error("智能体不存在");
+    }
+
+    // 更新位置
+    await ctx.db.patch(agent._id, {
+      position: args.newPosition,
+    });
+
+    return {
+      success: true,
+      message: `${agent.name} 移动到 (${args.newPosition.x}, ${args.newPosition.y})`,
+      newPosition: args.newPosition,
+    };
+  },
+});

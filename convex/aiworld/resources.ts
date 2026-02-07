@@ -53,15 +53,17 @@ export const RESOURCE_CONFIG = {
 };
 
 export function initializeResources(): Resource[] {
+  // 地图尺寸: 1000x700, TILE_SIZE: 50
+  // 可见范围: X: 0-19, Y: 0-13
   return [
-    { type: 'wood', position: { x: 10, y: 15 }, amount: 10, maxAmount: 10, regenerateRate: 0.1, lastRegenerate: Date.now() },
-    { type: 'wood', position: { x: 12, y: 16 }, amount: 10, maxAmount: 10, regenerateRate: 0.1, lastRegenerate: Date.now() },
-    { type: 'wood', position: { x: 14, y: 14 }, amount: 10, maxAmount: 10, regenerateRate: 0.1, lastRegenerate: Date.now() },
-    { type: 'stone', position: { x: 25, y: 8 }, amount: 15, maxAmount: 15, regenerateRate: 0.05, lastRegenerate: Date.now() },
-    { type: 'stone', position: { x: 27, y: 10 }, amount: 15, maxAmount: 15, regenerateRate: 0.05, lastRegenerate: Date.now() },
-    { type: 'food', position: { x: 5, y: 25 }, amount: 20, maxAmount: 20, regenerateRate: 0.2, lastRegenerate: Date.now() },
-    { type: 'food', position: { x: 8, y: 27 }, amount: 20, maxAmount: 20, regenerateRate: 0.2, lastRegenerate: Date.now() },
-    { type: 'gold', position: { x: 30, y: 30 }, amount: 5, maxAmount: 5, regenerateRate: 0.02, lastRegenerate: Date.now() },
+    { type: 'wood', position: { x: 3, y: 3 }, amount: 10, maxAmount: 10, regenerateRate: 0.1, lastRegenerate: Date.now() },
+    { type: 'wood', position: { x: 15, y: 4 }, amount: 10, maxAmount: 10, regenerateRate: 0.1, lastRegenerate: Date.now() },
+    { type: 'wood', position: { x: 8, y: 10 }, amount: 10, maxAmount: 10, regenerateRate: 0.1, lastRegenerate: Date.now() },
+    { type: 'stone', position: { x: 17, y: 2 }, amount: 15, maxAmount: 15, regenerateRate: 0.05, lastRegenerate: Date.now() },
+    { type: 'stone', position: { x: 12, y: 11 }, amount: 15, maxAmount: 15, regenerateRate: 0.05, lastRegenerate: Date.now() },
+    { type: 'food', position: { x: 2, y: 8 }, amount: 20, maxAmount: 20, regenerateRate: 0.2, lastRegenerate: Date.now() },
+    { type: 'food', position: { x: 18, y: 9 }, amount: 20, maxAmount: 20, regenerateRate: 0.2, lastRegenerate: Date.now() },
+    { type: 'gold', position: { x: 10, y: 6 }, amount: 5, maxAmount: 5, regenerateRate: 0.02, lastRegenerate: Date.now() },
   ];
 }
 
