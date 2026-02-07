@@ -147,7 +147,7 @@ export function AIWorldDashboard() {
                     </div>
                   </div>
                   <div className="mt-2 text-xs text-gray-400">
-                    Position: ({agent.position.x}, {agent.position.y})
+                    Position: ({agent.position?.x ?? 0}, {agent.position?.y ?? 0})
                   </div>
                 </div>
               ))}
@@ -168,7 +168,7 @@ export function AIWorldDashboard() {
                   <div className="flex justify-between items-center mb-2">
                     <h3 className="font-semibold capitalize">{resource.type}</h3>
                     <span className="text-sm text-gray-400">
-                      ({resource.position.x}, {resource.position.y})
+                      ({resource.position?.x ?? 0}, {resource.position?.y ?? 0})
                     </span>
                   </div>
                   <div className="w-full bg-slate-600 rounded-full h-2">
@@ -214,7 +214,7 @@ export function AIWorldDashboard() {
                     />
                   </div>
                   <div className="mt-1 text-xs text-gray-400">
-                    Health: {building.health}% | Position: ({building.position.x}, {building.position.y})
+                    Health: {building.health}% | Position: ({building.position?.x ?? 0}, {building.position?.y ?? 0})
                   </div>
                 </div>
               ))}
