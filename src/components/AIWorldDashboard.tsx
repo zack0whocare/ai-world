@@ -125,25 +125,25 @@ export function AIWorldDashboard() {
                   <div className="flex justify-between items-start mb-2">
                     <h3 className="font-semibold text-lg">{agent.name}</h3>
                     <span className="px-3 py-1 bg-blue-500/30 rounded-full text-sm">
-                      {agent.personality}
+                      {typeof agent.personality === 'string' ? agent.personality : agent.personality?.archetype || 'Unknown'}
                     </span>
                   </div>
                   <div className="grid grid-cols-4 gap-2 text-sm">
                     <div>
                       <span className="text-gray-400">Wood:</span>
-                      <span className="ml-1 font-medium">{agent.inventory.wood}</span>
+                      <span className="ml-1 font-medium">{agent.inventory?.wood ?? 0}</span>
                     </div>
                     <div>
                       <span className="text-gray-400">Stone:</span>
-                      <span className="ml-1 font-medium">{agent.inventory.stone}</span>
+                      <span className="ml-1 font-medium">{agent.inventory?.stone ?? 0}</span>
                     </div>
                     <div>
                       <span className="text-gray-400">Food:</span>
-                      <span className="ml-1 font-medium">{agent.inventory.food}</span>
+                      <span className="ml-1 font-medium">{agent.inventory?.food ?? 0}</span>
                     </div>
                     <div>
                       <span className="text-gray-400">Gold:</span>
-                      <span className="ml-1 font-medium text-yellow-400">{agent.inventory.gold}</span>
+                      <span className="ml-1 font-medium text-yellow-400">{agent.inventory?.gold ?? 0}</span>
                     </div>
                   </div>
                   <div className="mt-2 text-xs text-gray-400">
