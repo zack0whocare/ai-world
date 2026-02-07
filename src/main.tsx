@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom/client';
 import Home from './App.tsx';
 import AppAIWorld from './AppAIWorld.tsx';
 import AIWorldGame from './components/AIWorldGame.tsx';
+import AIWorldGameEnhanced from './components/AIWorldGameEnhanced.tsx';
 import './index.css';
 import 'uplot/dist/uPlot.min.css';
 import 'react-toastify/dist/ReactToastify.css';
@@ -15,7 +16,7 @@ const showAIWorldGame = window.location.pathname === '/game' || window.location.
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
     <ConvexClientProvider>
-      {showAIWorldGame ? <AIWorldGame /> : (showAIWorld ? <AppAIWorld /> : <Home />)}
+      {showAIWorldGame ? <AIWorldGameEnhanced /> : (showAIWorld ? <AppAIWorld /> : <Home />)}
     </ConvexClientProvider>
   </React.StrictMode>,
 );

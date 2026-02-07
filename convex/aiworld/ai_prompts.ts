@@ -3,6 +3,8 @@
  * 为不同性格的智能体生成个性化提示词
  */
 
+import { getEnhancedPersonality, generateEnhancedPrompt } from "./enhanced_personalities";
+
 /**
  * 性格描述映射
  */
@@ -81,6 +83,8 @@ export function generateDecisionPrompt(
   nearbyBuildings: any[],
   nearbyAgents: any[]
 ): string {
+  // 使用增强版性格系统
+  const enhancedPersonality = getEnhancedPersonality(personality);
   const personalityDesc = PERSONALITY_DESCRIPTIONS[personality] || PERSONALITY_DESCRIPTIONS.gatherer;
 
   // 当前状态
@@ -151,12 +155,17 @@ export function generateDecisionPrompt(
       .join("");
   }
 
-  // 系统提示词
-  const systemPrompt = `你是 ${agentName}，一个生活在 AI World 虚拟世界中的智能体。
+  // 系统提示词 - 使用增强版
+  const enhancedSystemPrompt = generateEnhancedPrompt(
+    enhancedPersonality,
+    agentName,
+    { inventory },
+    { nearbyResources, nearbyBuildings, nearbyAgents }
+  );
+  
+  const systemPrompt = `${enhancedSystemPrompt}
 
-${personalityDesc}
-
-请根据你的性格特点和当前情况，决定下一步行动。`;
+请根据你的完整性格特征和当前情况，决定下一步行动。`;
 
   // 用户提示词
   const userPrompt = `${inventoryDesc}
